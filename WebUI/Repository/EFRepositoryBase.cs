@@ -1,0 +1,76 @@
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
+using System.Linq.Expressions;
+using WebUI.Context;
+
+namespace WebUI.Repository
+{
+    public class EFRepositoryBase<TEntity> where TEntity : class
+    {
+        private readonly LocalContext _context;
+
+        public EFRepositoryBase(LocalContext context)
+        {
+            _context = context;
+        }
+
+        public TEntity Get(Expression<Func<TEntity, bool>> filter, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null)
+        { 
+            IQueryable<TEntity> queryable = _context.Set<TEntity>();
+            if (include != null) queryable = include(queryable);
+            return queryable.FirstOrDefault(filter)!;
+        }
+
+        public TEntity Add(TEntity entity)
+        { 
+
+            _context.Entry(entity).State = EntityState.Added;
+            _context.SaveChanges();
+            return entity;
+        }
+
+        public void Delete(TEntity entity)
+        { 
+            _context.Entry(entity).State = EntityState.Deleted;
+            _context.SaveChanges();
+        }
+
+        public TEntity Update(TEntity entity)
+        { 
+
+            _context.Entry(entity).State = EntityState.Modified;
+            _context.SaveChanges();
+            return entity;
+        }
+
+        public bool IsExist(Expression<Func<TEntity, bool>> filter)
+        { 
+
+            return _context.Set<TEntity>().Any(filter);
+        }
+
+        public ICollection<TEntity> GetAll(
+            Expression<Func<TEntity, bool>>? filter = null,
+            Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+            Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null,
+            bool enableTracking = true)
+        { 
+
+            IQueryable<TEntity> queryable = _context.Set<TEntity>();
+            if (!enableTracking) queryable = queryable.AsNoTracking();
+            if (include != null) queryable = include(queryable);
+            if (filter != null) queryable = queryable.Where(filter);
+            if (orderBy != null)
+                return orderBy(queryable).ToList();
+            return queryable.ToList();
+        }
+
+        public void DeleteByFilter(Expression<Func<TEntity, bool>> filter)
+        {  
+            var entity = _context.Set<TEntity>().Where(filter).FirstOrDefault();
+            if (entity == null) throw new InvalidOperationException("The specified entity to delete could not be found.");
+            _context.Entry(entity).State = EntityState.Deleted;
+            _context.SaveChanges();
+        }
+    }
+}
