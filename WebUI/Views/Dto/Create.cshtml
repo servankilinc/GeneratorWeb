@@ -1,0 +1,127 @@
+﻿@using WebUI.ViewModels.Dtos
+@model VMDtoCreate
+
+@{
+    ViewData["Title"] = "Create Dto";
+    var rowIndex = 0;
+}
+
+
+@* 
+    public int RelatedEntityId { get; set; }
+    public string Name { get; set; } = null!;
+    public List<DtoFieldCreateDto> DtoFields { get; set; } = null!;
+    public class DtoFieldCreateDto
+    {
+        public int DtoId { get; set; }
+        public string? Name { get; set; }
+        public int SourceFieldId { get; set; }
+    } *@
+
+<form asp-controller="Dto" asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="FormModel.Name" class="control-label"></label>
+        <input asp-for="FormModel.Name" class="form-control" />
+        <span asp-validation-for="FormModel.Name" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="FormModel.RelatedEntityId" class="control-label"></label>
+        <select asp-for="FormModel.RelatedEntityId" asp-items="@Model.EntityList" id="select-related-entity-base" class="form-control">
+            <option value="" selected disabled>Select Entity</option>
+        </select>
+        <span asp-validation-for="FormModel.RelatedEntityId" class="text-danger"></span>
+    </div>
+
+    <div>
+        <table class="table table-bordered table-striped table-light my-3">
+            <thead>
+                <tr>
+                    <th>Source Entity</th>
+                    <th>Field</th>
+                    <th>Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="fieldsContainer">
+                <!-- BODY -->
+            </tbody>
+        </table>
+        <button type="button" id="addField" class="btn btn-primary">Add Field</button>
+    </div>
+
+    <!-- Submit Button -->
+    <div class="form-group mt-3">
+        <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-success">Create</button>
+    </div>
+</form>
+
+
+@section Scripts {
+    <script>
+        const entityOptions = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.EntityList));
+        const fieldOptions = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AllFieldList));
+
+        let fieldCount = 0;
+
+        // Add new field row
+        document.getElementById('addField').addEventListener('click', function () {
+            const container = document.getElementById('fieldsContainer');
+            const newRow = document.createElement('tr');
+
+            // Build the options dynamically
+            const optionsHtml = fieldOptions.map(f => `<option value="${f.Id}" related-entity="${f.EntityId}">${f.Name}</option>`).join('');
+
+            newRow.innerHTML = `
+                <td>
+                    <select id="select-entity-byRow-${fieldCount}" class="form-control form-control-sm">
+                        <option value="" selected disabled>Select Entity</option>
+                        ${entityOptions.map(e => `<option value="${e.Value}">${e.Text}</option>`).join('')}
+                    </select>
+                </td>
+                <td>
+                    <select id="select-field-byRow-${fieldCount}" name="FormModel.DtoFields[${fieldCount}].SourceFieldId" class="form-control form-control-sm">
+                        <option value="" selected disabled>Select Field</option>
+                        ${optionsHtml}
+                    </select>
+                </td>
+                <td>
+                    <input id="text-name-byRow-${fieldCount}" type="text" name="FormModel.DtoFields[${fieldCount}].Name" class="form-control form-control-sm" />
+                </td>
+                <td>
+                    <button type="button" class="btn btn-sm btn-danger remove-field">Remove</button>
+                </td>
+            `;
+            container.appendChild(newRow);
+
+            fieldCount++;
+        });
+
+        // Delegated event for select-entity change
+        $('#fieldsContainer').on('change', 'select[id^="select-entity-byRow-"]', function () {
+            const entityId = $(this).val();
+            const rowId = $(this).attr('id').replace('select-entity-byRow-', '');
+            $(`#select-field-byRow-${rowId} option`).each(function () {
+                if ($(this).attr('related-entity') == entityId) {
+                    $(this).show();
+                } else {
+                    $(this).hide();
+                }
+            });
+        });
+
+        // Delegated event for select-field change
+        $('#fieldsContainer').on('change', 'select[id^="select-field-byRow-"]', function () {
+            const rowId = $(this).attr('id').replace('select-field-byRow-', '');
+            $(`#text-name-byRow-${rowId}`).val($(this).find(':selected').text());
+        });
+
+        // Remove field row
+        document.getElementById('fieldsContainer').addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-field')) {
+                e.target.closest('tr').remove();
+            }
+        });
+    </script>
+}

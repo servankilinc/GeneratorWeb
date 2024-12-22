@@ -7,8 +7,8 @@
         public int ForeignFieldId { get; set; }
         public int RelationTypeId { get; set; }
 
-        public Field? PrimaryField { get; set; }
-        public Field? ForeignField { get; set; }
-        public RelationType? RelationType { get; set; }
+        public Field PrimaryField { get; set; } = null!;
+        public Field ForeignField { get; set; } = null!;
+        public RelationType RelationType { get; set; } = null!;
     }
 }

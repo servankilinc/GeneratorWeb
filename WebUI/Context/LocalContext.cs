@@ -15,7 +15,7 @@ namespace WebUI.Context
         public DbSet<Relation> Relations { get; set; }
         public DbSet<RelationType> RelationTypes { get; set; }
         public DbSet<Dto> Dtos { get; set; }
-        public DbSet<DtoFieldMap> DtoFieldMaps { get; set; }
+        public DbSet<DtoField> DtoFields { get; set; }
 
 
 
@@ -58,9 +58,9 @@ namespace WebUI.Context
                     .WithOne(r => r.ForeignField)
                     .HasForeignKey(f => f.ForeignFieldId);
 
-                f.HasMany(f => f.DtoFieldMaps)
-                    .WithOne(r => r.Field)
-                    .HasForeignKey(f => f.FieldId);
+                f.HasMany(f => f.DtoFields)
+                    .WithOne(df => df.SourceField)
+                    .HasForeignKey(df => df.SourceFieldId);
             });
 
             modelBuilder.Entity<FieldType>(ft =>
@@ -130,21 +130,21 @@ namespace WebUI.Context
                     .WithMany(r => r.Dtos)
                     .HasForeignKey(r => r.RelatedEntityId);
 
-                d.HasMany(d => d.DtoFieldMaps)
+                d.HasMany(d => d.DtoFields)
                     .WithOne(r => r.Dto)
                     .HasForeignKey(r => r.DtoId);
             });
 
-            modelBuilder.Entity<DtoFieldMap>(dfm =>
+            modelBuilder.Entity<DtoField>(dfm =>
             {
-                dfm.HasKey(dfm => new { dfm.DtoId, dfm.FieldId });
+                dfm.HasKey(dfm => new { dfm.DtoId, dfm.SourceFieldId });
 
-                dfm.HasOne(dfm => dfm.Field)
-                   .WithMany(f => f.DtoFieldMaps)
-                   .HasForeignKey(dfm => dfm.FieldId);
+                dfm.HasOne(dfm => dfm.SourceField)
+                   .WithMany(f => f.DtoFields)
+                   .HasForeignKey(dfm => dfm.SourceFieldId);
 
                 dfm.HasOne(dfm => dfm.Dto)
-                   .WithMany(f => f.DtoFieldMaps)
+                   .WithMany(f => f.DtoFields)
                    .HasForeignKey(dfm => dfm.DtoId);
             });
         }

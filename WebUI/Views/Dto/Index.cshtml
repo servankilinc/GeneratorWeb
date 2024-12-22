@@ -1,0 +1,72 @@
+﻿@using WebUI.ViewModels.Dtos
+@model VMDtoIndex
+@{
+    ViewData["Title"] = "Dto Page";
+}
+
+<a class="btn btn-primary btn-lg my-4" asp-controller="Dto" asp-action="Create">Create Dto</a>
+<br />
+
+<div class="form-control mb-4">
+    <label asp-for="@Model.EntityList" class="form-label">Filter By Entity</label>
+    <select asp-items="@Model.EntityList" class="form-select" id="select-related-entity">
+        <option value="" disabled>Select Entity</option>
+    </select>
+</div>
+
+@if (Model.DtoList != null)
+{
+    foreach (var dto in Model.DtoList)
+    {
+        <div class="dto-field" related-entity="@dto.RelatedEntityId">
+
+            <div class="alert alert-primary" role="alert">
+                <div class="d-flex justify-content-between">
+                    <span>
+                        @dto.Id - @dto.Name
+                    </span>
+                    <a class="btn btn-danger btn-sm" asp-controller="Dto" asp-action="Delete" asp-route-id="@dto.Id">
+                        Delete
+                    </a>
+                </div>
+            </div>
+            <table class="table table-bordered table-striped table-light">
+                <thead>
+                    <tr>
+                        <th scope="col">Field</th>
+                        <th scope="col">Type</th>
+                        <th scope="col">Related Entity</th>
+                        @* <th scope="col">Actions</th> *@
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var dtoField in dto.DtoFields)
+                    {
+                        <tr>
+                            <td>@dtoField.Name</td>
+                            <td>@dtoField.SourceField.FieldType.Name</td>
+                            <td>@dtoField.SourceField.Entity.Name</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+}
+
+
+@section Scripts {
+    <script>
+
+        $("#select-related-entity").change(function () {
+            var entityId = $(this).val();
+            $(".dto-field").map(function (index, element) {
+                if ($(element).attr("related-entity") == entityId) {
+                    $(element).show();
+                } else {
+                    $(element).hide();
+                }
+            });
+        });
+    </script>
+}

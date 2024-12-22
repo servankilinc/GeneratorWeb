@@ -8,10 +8,10 @@
         public int FieldTypeId { get; set; }
         public bool IsUnique { get; set; }
 
-        public Entity? Entity { get; set; }
-        public FieldType? FieldType { get; set; }
-        public List<Relation>? RelationsPrimary { get; set; }
-        public List<Relation>? RelationsForeign { get; set; }
-        public List<DtoFieldMap>? DtoFieldMaps { get; set; }
+        public Entity Entity { get; set; } = null!;
+        public FieldType FieldType { get; set; } = null!;
+        public List<Relation> RelationsPrimary { get; set; } = null!;
+        public List<Relation> RelationsForeign { get; set; } = null!;
+        public List<DtoField> DtoFields { get; set; } = null!;
     }
 }

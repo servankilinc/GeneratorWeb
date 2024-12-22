@@ -1,7 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WebUI.Context;
-using WebUI.Dtos;
+using WebUI.Dtos._Relation;
+using WebUI.Dtos._Entity;
+using WebUI.Dtos._Field;
 using WebUI.Models;
+using WebUI.Dtos._FieldType;
 
 namespace WebUI.Repository
 {
@@ -14,7 +17,7 @@ namespace WebUI.Repository
         }
 
         public List<EntityResponseDto> GetEntityResponseList()
-        { 
+        {
             var result1 = _context.Entities
                 .Include(e => e.Fields)
                     .ThenInclude(f => f.FieldType)

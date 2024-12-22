@@ -1,0 +1,70 @@
+﻿@using WebUI.ViewModels.Entity
+@model VMEntityAddRelation
+@{
+    Layout = null;
+}
+
+
+<form asp-controller="Entity" asp-action="AddRelation" method="post">
+    <input type="hidden" name="ForeignFieldId" value="@Model.FieldId" />
+    <div class="modal-body">
+        <div class="form-control">
+            <select class="form-select" asp-items="@Model.EntityList" id="select-entity-add-realtion-modal" aria-label="Default select example">
+                <option selected disabled>Select</option>
+            </select>
+        </div>
+        <div class="form-control">
+            <select class="form-select" name="PrimaryFieldId" id="fieldList" aria-label="Default select example">
+                @if (Model.AllFieldList != null)
+                {
+                    foreach (var item in Model.AllFieldList)
+                    {
+                        // dont show fields of entity of current selected
+                        if (item.IsAlreadyRelated)
+                        {
+                            <option value="@item.Id" entity-id="@item.EntityId" disabled>
+                                @item.Name
+                                <span style="font-size:smaller; font-weight:300;">
+                                    (@item.FieldType.Name)
+                                </span>
+                            </option>
+                        }
+                        else
+                        {
+                            <option value="@item.Id" entity-id="@item.EntityId">
+                                @item.Name
+                                <span style="font-size:smaller; font-weight:300;">
+                                    (@item.FieldType.Name)
+                                </span>
+                            </option>
+                        }
+                    }
+                }
+            </select>
+            <small>@Model.FieldName tipindeki alanlar listelenmektedir!</small>
+        </div>
+        <div class="form-control">
+            <select class="form-select" name="RelationTypeId" asp-items="@Model.RelationTypeList" aria-label="Default select example">
+            </select>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Save changes</button>
+    </div>
+</form>
+
+
+<script>
+    $("#select-entity-add-realtion-modal").on("change", function(){
+        $("#fieldList option").map((i,e) => {
+            console.log(" => ", $(e).attr("entity-id"), $(this).val());
+            if($(e).attr("entity-id") == $(this).val()){
+                $(e).css("display", "block");
+            }
+            else{
+                $(e).css("display", "none");
+            }
+        })
+    })
+</script>
