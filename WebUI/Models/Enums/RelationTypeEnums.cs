@@ -2,8 +2,8 @@
 {
     public enum RelationTypeEnums
     {
-        OnoToOne = 1,
-        OnoToMany = 2,
-        ManyToMany = 3
+        OneToOne = 1,
+        OneToMany = 2,
+        //ManyToMany = 3
     }
 }

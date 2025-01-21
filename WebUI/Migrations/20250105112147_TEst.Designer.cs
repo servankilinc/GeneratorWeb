@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using WebUI.Context;
 
@@ -11,9 +12,11 @@ using WebUI.Context;
 namespace WebUI.Migrations
 {
     [DbContext(typeof(LocalContext))]
-    partial class LocalContextModelSnapshot : ModelSnapshot
+    [Migration("20250105112147_TEst")]
+    partial class TEst
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -60,9 +63,6 @@ namespace WebUI.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("SourceFieldId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("ValidationId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -415,8 +415,6 @@ namespace WebUI.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RelatedEntityId");
-
                     b.HasIndex("ServiceLayerId", "RelatedEntityId")
                         .IsUnique();
 
@@ -486,8 +484,7 @@ namespace WebUI.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DtoFieldId")
-                        .IsUnique();
+                    b.HasIndex("DtoFieldId");
 
                     b.HasIndex("ValidatorTypeId");
 
@@ -510,7 +507,7 @@ namespace WebUI.Migrations
 
                     b.HasIndex("ValidatorTypeParamId");
 
-                    b.ToTable("ValidationParams");
+                    b.ToTable("ValidationParam");
                 });
 
             modelBuilder.Entity("WebUI.Models.ValidatorType", b =>
@@ -831,7 +828,7 @@ namespace WebUI.Migrations
                 {
                     b.HasOne("WebUI.Models.Entity", "RelatedEntity")
                         .WithMany("Services")
-                        .HasForeignKey("RelatedEntityId")
+                        .HasForeignKey("ServiceLayerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -849,8 +846,8 @@ namespace WebUI.Migrations
             modelBuilder.Entity("WebUI.Models.Validation", b =>
                 {
                     b.HasOne("WebUI.Models.DtoField", "DtoField")
-                        .WithOne("Validation")
-                        .HasForeignKey("WebUI.Models.Validation", "DtoFieldId")
+                        .WithMany("Validations")
+                        .HasForeignKey("DtoFieldId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -902,7 +899,7 @@ namespace WebUI.Migrations
 
             modelBuilder.Entity("WebUI.Models.DtoField", b =>
                 {
-                    b.Navigation("Validation");
+                    b.Navigation("Validations");
                 });
 
             modelBuilder.Entity("WebUI.Models.Entity", b =>

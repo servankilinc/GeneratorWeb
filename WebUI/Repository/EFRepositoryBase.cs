@@ -14,14 +14,14 @@ namespace WebUI.Repository
             _context = context;
         }
 
-        public TEntity Get(Expression<Func<TEntity, bool>> filter, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null)
+        public virtual TEntity Get(Expression<Func<TEntity, bool>> filter, Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null)
         { 
             IQueryable<TEntity> queryable = _context.Set<TEntity>();
             if (include != null) queryable = include(queryable);
             return queryable.FirstOrDefault(filter)!;
         }
 
-        public TEntity Add(TEntity entity)
+        public virtual TEntity Add(TEntity entity)
         { 
 
             _context.Entry(entity).State = EntityState.Added;
@@ -29,13 +29,13 @@ namespace WebUI.Repository
             return entity;
         }
 
-        public void Delete(TEntity entity)
+        public virtual void Delete(TEntity entity)
         { 
             _context.Entry(entity).State = EntityState.Deleted;
             _context.SaveChanges();
         }
 
-        public TEntity Update(TEntity entity)
+        public virtual TEntity Update(TEntity entity)
         { 
 
             _context.Entry(entity).State = EntityState.Modified;
@@ -43,13 +43,13 @@ namespace WebUI.Repository
             return entity;
         }
 
-        public bool IsExist(Expression<Func<TEntity, bool>> filter)
+        public virtual bool IsExist(Expression<Func<TEntity, bool>> filter)
         { 
 
             return _context.Set<TEntity>().Any(filter);
         }
 
-        public ICollection<TEntity> GetAll(
+        public virtual ICollection<TEntity> GetAll(
             Expression<Func<TEntity, bool>>? filter = null,
             Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
             Func<IQueryable<TEntity>, IIncludableQueryable<TEntity, object>>? include = null,
@@ -65,7 +65,7 @@ namespace WebUI.Repository
             return queryable.ToList();
         }
 
-        public void DeleteByFilter(Expression<Func<TEntity, bool>> filter)
+        public virtual void DeleteByFilter(Expression<Func<TEntity, bool>> filter)
         {
             var entity = _context.Set<TEntity>().Where(filter).FirstOrDefault();
             if (entity == null) throw new InvalidOperationException("The specified entity to delete could not be found.");

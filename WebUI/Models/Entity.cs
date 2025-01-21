@@ -7,5 +7,6 @@ namespace WebUI.Models
         public string Name { get; set; } = null!;
         public List<Field> Fields { get; set; } = null!;
         public List<Dto>? Dtos { get; set; }
+        public List<Service>? Services { get; set; }
     }
 }

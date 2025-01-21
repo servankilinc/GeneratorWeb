@@ -1,6 +1,7 @@
 ﻿using WebUI.Context;
 using WebUI.Dtos._Dto;
 using WebUI.Models;
+using WebUI.Models.Enums;
 
 namespace WebUI.Repository
 {
@@ -13,21 +14,27 @@ namespace WebUI.Repository
         }
 
 
-        public Dto CreateByFields(DtoCreateDto createDto)
+        public void CreateByFields(DtoCreateDto createDto)
         {
             using var transaction = _context.Database.BeginTransaction();
             try
             {
-                var dtoToInsert = new Dto()
+                var insertedDto = _context.Dtos.Add(new Dto()
                 {
                     Name = createDto.Name,
                     RelatedEntityId = createDto.RelatedEntityId,
-                };
+                }).Entity;
 
-                var inserting = _context.Dtos.Add(dtoToInsert);
                 _context.SaveChanges();
 
-                Dto insertedDto = inserting.Entity;
+                _context.Set<FieldType>().Add(new FieldType
+                {
+                    Name = insertedDto.Name,
+                    SourceTypeId = (int)FieldTypeSourceEnums.Dto,
+                });
+                _context.SaveChanges();
+
+
 
                 foreach (var sourceField in createDto.DtoFields)
                 {
@@ -41,7 +48,6 @@ namespace WebUI.Repository
                 _context.SaveChanges();
 
                 transaction.Commit();
-                return dtoToInsert;
             }
             catch (Exception)
             {

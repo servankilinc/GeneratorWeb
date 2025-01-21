@@ -10,7 +10,7 @@ builder.Services.AddControllersWithViews()
  
 
 builder.Services.AddDbContext<LocalContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("LocalDatabase")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("LocalDatabase")));
 
 builder.Services.AddScoped<EntityRepository>();
 builder.Services.AddScoped<DtoRepository>();

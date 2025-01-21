@@ -46,6 +46,7 @@ namespace WebUI.Controllers
         }
 
         // ---------------- RELATIONS ----------------
+        #region Relations
         [HttpGet]
         public IActionResult ShowRelationModal(int id)
         {
@@ -126,6 +127,7 @@ namespace WebUI.Controllers
 
             return RedirectToAction("Index");
         }
+        #endregion
 
         // ---------------- DELETE ----------------
         [HttpGet]
@@ -167,24 +169,7 @@ namespace WebUI.Controllers
         [HttpPost]
         public IActionResult Create(VMEntityCreate createDto)
         {
-            var insertedEntity = _entityRepository.Add(new Models.Entity
-            {
-                Name = createDto.FormModel.Name,
-                TableName = createDto.FormModel.TableName
-            });
-
-            var Fields = createDto.FormModel.Fields.Select(f => new Models.Field()
-            {
-                FieldTypeId = f.FieldTypeId,
-                IsUnique = f.IsUnique,
-                Name = f.Name,
-                EntityId = insertedEntity.Id,
-            }).ToList();
-            foreach (var item in Fields)
-            {
-                var insertedField = _fieldRepository.Add(item);
-                Console.Write(insertedField);
-            }
+            _entityRepository.AddByDto(createDto);
 
             return RedirectToAction("Create");
         }

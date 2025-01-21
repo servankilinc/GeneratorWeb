@@ -5,6 +5,9 @@ using WebUI.Dtos._Entity;
 using WebUI.Dtos._Field;
 using WebUI.Models;
 using WebUI.Dtos._FieldType;
+using Microsoft.AspNetCore.Http.HttpResults;
+using WebUI.ViewModels.Entity;
+using WebUI.Models.Enums;
 
 namespace WebUI.Repository
 {
@@ -14,6 +17,50 @@ namespace WebUI.Repository
         public EntityRepository(LocalContext context) : base(context)
         {
             _context = context;
+        }
+
+        public void AddByDto(VMEntityCreate createDto)
+        {
+            var transaction = _context.Database.BeginTransaction();
+            try
+            {
+                var entityToInsert = new Entity
+                {
+                    Name = createDto.FormModel.Name,
+                    TableName = createDto.FormModel.TableName
+                };
+                var insertedEntity = _context.Set<Entity>().Add(entityToInsert).Entity;
+                _context.SaveChanges();
+
+                _context.Set<FieldType>().Add(new FieldType
+                {
+                    Name = insertedEntity.Name,
+                    SourceTypeId = (int)FieldTypeSourceEnums.Entity,
+                });
+                _context.SaveChanges();
+
+                var Fields = createDto.FormModel.Fields.Select(f => new Field()
+                {
+                    FieldTypeId = f.FieldTypeId,
+                    IsUnique = f.IsUnique,
+                    Name = f.Name,
+                    EntityId = insertedEntity.Id,
+                    IsList = f.IsList
+                }).ToList();
+                foreach (var item in Fields)
+                {
+                    _context.Set<Field>().Add(item); 
+                }
+
+                _context.SaveChanges();
+
+                transaction.Commit();
+            }
+            catch (Exception)
+            {
+                transaction.Rollback();
+                throw;
+            }
         }
 
         public List<EntityResponseDto> GetEntityResponseList()

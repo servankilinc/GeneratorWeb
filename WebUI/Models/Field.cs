@@ -4,9 +4,10 @@
     {
         public int Id { get; set; }
         public int EntityId { get; set; }
-        public string Name { get; set; } = null!;
         public int FieldTypeId { get; set; }
+        public string Name { get; set; } = null!;
         public bool IsUnique { get; set; }
+        public bool IsList { get; set; }
 
         public Entity Entity { get; set; } = null!;
         public FieldType FieldType { get; set; } = null!;

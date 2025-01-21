@@ -109,7 +109,7 @@ namespace WebUI.Controllers
         [HttpPost]
         public IActionResult Create(VMDtoCreate viewModel)
         {
-            var insertedDto = _dtoRepository.CreateByFields(viewModel.FormModel);
+            _dtoRepository.CreateByFields(viewModel.FormModel);
 
             return RedirectToAction("Index");
         }
